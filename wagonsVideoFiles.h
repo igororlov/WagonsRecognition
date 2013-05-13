@@ -18,9 +18,10 @@ using namespace std;
 #define FILE_8 "hoppers.avi"
 #define FILE_9 "wagons.avi"
 #define FILE_10 "wagons2.avi"
+#define DEFAULT_TRACK FILE_5
 
-int chooseTrackNum();
-string getPathToVideo(int trackNum);
+int chooseVideoTrackNum();
+string getPathToVideo(int videoTrackNum);
 
 
 #endif

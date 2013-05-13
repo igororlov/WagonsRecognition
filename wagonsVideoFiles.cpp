@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int chooseTrackNum()
+int chooseVideoTrackNum()
 {
 	int trackNum = -1;
 
@@ -31,7 +31,7 @@ string getPathToVideo(int trackNum)
 	if ( trackNum <= 0 || trackNum > FILES_COUNT )
 	{
 		cout << "Incorrect file number!" << endl;
-		return "";
+		cout << DEFAULT_TRACK << " was selected!" << endl;
 	}
 
 	string pathToVideo = VIDEO_PATH;
@@ -66,6 +66,9 @@ string getPathToVideo(int trackNum)
 		break;
 	case 10:
 		pathToVideo.append(FILE_10);
+		break;
+	default:
+		pathToVideo.append(DEFAULT_TRACK);
 		break;
 	}
 	return pathToVideo;

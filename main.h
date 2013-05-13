@@ -17,5 +17,7 @@
 
 // Wagons
 #include "wagonsVideoFiles.h"
+#include "wagonsNumberDetection.h"
+#include "wagonsDrawing.h"
 
 #endif
