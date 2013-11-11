@@ -3,63 +3,72 @@
 using namespace std;
 using namespace cv;
 
-int g_slider_position = 0;
-CvCapture* videoCapture = NULL;
+static int VIDEO_TRACKBAR_VALUE = 0;
+int frameNumber = 0;
+VideoCapture capture;
 
-void onTrackbarSlide(int pos) {
-	cvSetCaptureProperty(videoCapture, CV_CAP_PROP_POS_FRAMES, pos);
+void onTrackbarListener( int, void* )
+{
+	capture.set(CV_CAP_PROP_POS_FRAMES, VIDEO_TRACKBAR_VALUE);
+}
+
+Mat lpr(Mat &frame) {
+	Mat gray;
+	cvtColor(frame, gray, CV_BGR2GRAY);
+	blur(gray, gray, Size(3, 3));
+	
+	//Find vertical lines. Car plates have high density of vertical lines
+	Mat imgSobel;
+	Sobel(gray, imgSobel, CV_8U, 1, 0, 3, 1, 0);
+
+	//threshold image
+	Mat imgThreshold;
+	threshold(imgSobel, imgThreshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
+	
+	// Morph close
+	Mat element = getStructuringElement(MORPH_RECT, Size(17, 3));
+	morphologyEx(imgThreshold, imgThreshold, CV_MOP_CLOSE, element);
+
+	return imgThreshold;
 }
 
 int main()
 {
 	int videoTrackNum = chooseVideoTrackNum();
-	string path = getPathToVideo(videoTrackNum);
-	if ( path.length() == 0 ) {
+	string videoTrackPath = getPathToVideo(videoTrackNum);
+	if ( videoTrackPath.length() == 0 ) {
 		return -1;
 	}
 	
-	cvNamedWindow("Main window", CV_WINDOW_AUTOSIZE);
-	videoCapture = cvCreateFileCapture(path.c_str());
-	
-	int framesCount = (int) cvGetCaptureProperty(videoCapture, CV_CAP_PROP_FRAME_COUNT);
-	if( framesCount != 0 ) {
-		cvCreateTrackbar("FrameNo", "Main window", &g_slider_position, framesCount, onTrackbarSlide);
-	}
-	
-	IplImage* frame;
-	while(1) {
-		frame = cvQueryFrame(videoCapture);
-		if ( !frame ) { 
-			break;
-		}
-		setTrackbarPos("FrameNo", "Main window", 1 + getTrackbarPos("FrameNo", "Main window"));
-		
-		Mat image(frame);
-		
-		vector<KeyPoint> keypoints = detectCorners(image, 0.5, 15);
-		drawKeypoints(image, keypoints, image, COLOR_GREEN_CPP, DrawMatchesFlags::DRAW_OVER_OUTIMG);
-		vector<vector<KeyPoint>> kpGroups = getKeypointGroups(keypoints, 20, 10);
-		for ( int i = 0; i < kpGroups.size(); i++) {
-			vector<Point> points;
-			for ( int j = 0; j < kpGroups.at(i).size(); j++ ) {
-				Point p = kpGroups.at(i).at(j).pt;
-				points.push_back(p);
-			}
-			Rect rect = boundingRect(points);
-			rectangle(image, rect, COLOR_RED_CPP);
-		}
+	capture.open("C:\\Users\\Igor\\Dropbox\\WORK\\Video\\russia-day.avi");
+	//capture.open("C:\\Main\\Work\\Video\\kazahstan.avi");
+	//capture.open(videoTrackPath.c_str());
 
-		cvShowImage("Main window", frame);
-		
-		char c = cvWaitKey(33);
-		if ( c == 27 ) {
+	int trackbarValue = 0;
+	int totalFramesCount = (int)capture.get(CV_CAP_PROP_FRAME_COUNT); // общее к-во кадров на видео
+	if (totalFramesCount <= 0) return 0;
+
+	namedWindow("Main window");
+	createTrackbar("Frame No", "Main window", &trackbarValue, totalFramesCount, onTrackbarListener);
+
+	double rate = capture.get(CV_CAP_PROP_FPS); // frames per second
+	int delay = 1000 / (int)rate;
+	
+	Mat frame;
+	while (1) {
+		if (!capture.read(frame))
 			break;
-		} else if ( c == 32 ) {
-			cvWaitKey(0);
+		frame = lpr(frame);
+		
+		imshow("Main window", frame);
+		char c = waitKey(delay);
+		if (c == 27) {
+			break;
+		} else if (c == 32) {
+			waitKey(0);
 		}
+		frame.release();
 	}
-	cvReleaseCapture(&videoCapture);
-	cvDestroyWindow("Main window");
 
 	return 0;
 }
