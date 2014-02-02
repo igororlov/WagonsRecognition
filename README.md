@@ -1,4 +1,4 @@
-WagonsRecognition
+Wagons Recognition
 =================
 
 Project for railway wagons number recognition. Uses OpenCV library (C++ interface), IDE - Visual Studio 2010.
