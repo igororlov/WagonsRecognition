@@ -9,3 +9,5 @@ Read more:<br/>
 http://www.rzd.me/inform-block/numbers-vagon-carg/ <br/>
 http://www.translogist.ru/check_n.asp <br/>
 http://железнодорожник.рф/poleznaja_informacija/rasshifrovka_nomera_vagona/ <br/>
+
+See also project's [Wiki](https://github.com/igororlov92/WagonsRecognition/wiki)
