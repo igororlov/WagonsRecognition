@@ -12,10 +12,11 @@ void onTrackbarListener(int pos, void*) {
 	}
 }
 
+// TODO implement image source! (now only video source). Try to avoid OOP
 int main() {
 	int videoTrackNum = chooseVideoTrackNum();
 	string videoTrackPath = getPathToVideo(videoTrackNum);
-	if ( videoTrackPath.length() == 0 ) {
+	if (videoTrackPath.length() == 0) {
 		return -1;
 	}
 	
