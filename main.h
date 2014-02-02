@@ -16,8 +16,11 @@
 #include "opencv2\features2d\features2d.hpp"
 
 // Wagons
+#include "wagonsPreferences.h"
+#include "wagonsDrawing.h"
 #include "wagonsVideoFiles.h"
 #include "wagonsNumberDetection.h"
-#include "wagonsDrawing.h"
+#include "wagonsUtil.h"
+
 
 #endif

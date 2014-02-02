@@ -8,18 +8,20 @@ using namespace std;
 
 #define FILES_COUNT 11
 
-static const char *VIDEOFILES[FILES_COUNT] = { "_3.avi", 
-												"_4.avi",
-												"4 mins.avi",
-												"all.avi",
-												"cisterns.avi",
-												"cisterns2.avi",
-												"cisterns3.avi",
-												"hoppers.avi",
-												"wagons.avi",
-												"wagons2.avi",
-												"stirol1.avi" };
+static const char *VIDEOFILES[FILES_COUNT] = { "_3", 
+												"_4",
+												"4 mins",
+												"all",
+												"cisterns",
+												"cisterns2",
+												"cisterns3",
+												"hoppers",
+												"wagons",
+												"wagons2",
+												"stirol1" };
 #define DEFAULT_TRACK 5
+#define VIDEO_EXTENSION ".avi"
+#define CONFIG_EXTENSION ".txt"
 
 int chooseVideoTrackNum();
 string getPathToVideo(int videoTrackNum);

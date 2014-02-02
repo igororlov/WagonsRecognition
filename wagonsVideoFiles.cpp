@@ -30,6 +30,7 @@ string getPathToVideo(int trackNum)
 	string pathToVideo = VIDEO_PATH;
 
 	pathToVideo.append(VIDEOFILES[trackNum-1]);
+	pathToVideo.append(VIDEO_EXTENSION);
 
 	return pathToVideo;
 }

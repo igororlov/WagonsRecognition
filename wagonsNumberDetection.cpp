@@ -104,3 +104,29 @@ vector<vector<KeyPoint>> getKeypointGroups(vector<KeyPoint> keypoints, int RADIU
 	}
 	return kp_groups;
 }
+
+Mat detection(Mat &frame) {
+	Mat gray;
+	if (frame.channels() != 1) {
+		cvtColor(frame, gray, CV_BGR2GRAY);
+	} else {
+		frame.copyTo(gray);
+	}
+	
+	int blurSize = getBlurSize(CHAR_HEIGHT);
+	blur(gray, gray, Size(blurSize, blurSize));
+	
+	// Find vertical lines. Car plates have high density of vertical lines
+	Mat imgSobel;
+	Sobel(gray, imgSobel, CV_8U, 1, 0, 3, 1, 0);
+
+	// Threshold image
+	Mat imgThreshold;
+	threshold(imgSobel, imgThreshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
+	
+	// Morph close
+	Mat element = getStructuringElement(MORPH_RECT, Size(17, 3));
+	morphologyEx(imgThreshold, imgThreshold, CV_MOP_CLOSE, element);
+
+	return imgThreshold;
+}
