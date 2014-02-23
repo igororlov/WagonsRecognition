@@ -3,8 +3,80 @@
 using namespace cv;
 using namespace std;
 
-// ??? почему он внутри функции применяется, а сюда не возвращается???
-// ссылка хреново работает!
+
+vector<Rect> Detector::getRects() {
+	return _rects;
+}
+
+void Detector::drawRects(Mat &image) {
+	
+	for (int i = 0; i < _rects.size(); i++) {
+		Rect currentRect = _rects.at(i);
+		rectangle(image, 
+			Point(currentRect.x, currentRect.y), 
+			Point(currentRect.x + currentRect.width, currentRect.y + currentRect.height),
+			COLOR_RED_CPP); // TODO may be gray color?
+	}
+}
+
+bool Detector::verifySize(Rect rect) {
+	if (rect.height > rect.width) { // TODO add adequate check
+		return false;
+	}
+	return true;
+}
+
+void MorphologyDetector::detect(const Mat &inputImage) {
+	
+	Mat imgPrepared;
+	morphDetect(inputImage, imgPrepared);
+
+	//Find contours of possibles plates
+	vector<vector<Point>> contours;
+	findContours(imgPrepared, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+
+	//Start to iterate to each contour found
+	vector<vector<Point>>::iterator itc = contours.begin();
+
+	//Remove patch that has no inside limits of aspect ratio and area.
+	while (itc != contours.end()) {
+		Rect rect = boundingRect(Mat(*itc));
+		// RotatedRect mr = minAreaRect(Mat(*itc));
+		if (!verifySize(rect)) {
+			itc = contours.erase(itc);
+		} else {
+			++itc;
+			_rects.push_back(rect);
+		}
+	}
+}
+
+void MorphologyDetector::morphDetect(const Mat &inputImage, Mat& outputImage) {
+	Mat gray;
+	if (inputImage.channels() != 1) {
+		cvtColor(inputImage, gray, CV_BGR2GRAY);
+	} else {
+		inputImage.copyTo(gray);
+	}
+	
+	int blurSize = getBlurSize(CHAR_HEIGHT);
+	blur(gray, gray, Size(blurSize, blurSize));
+	
+	// Find vertical lines. Car plates have high density of vertical lines
+	Mat imgSobel;
+	Sobel(gray, imgSobel, CV_8U, 1, 0, 3, 1, 0);
+
+	// Threshold image
+	Mat imgThreshold;
+	threshold(imgSobel, imgThreshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
+	
+	// Morph close
+	Mat element = getStructuringElement(MORPH_RECT, Size(17, 3));
+	morphologyEx(imgThreshold, imgThreshold, CV_MOP_CLOSE, element);
+
+	imgThreshold.copyTo(outputImage); // TODO avoid copying!
+}
+
 Mat& sobelFilter(Mat &image)
 {
 	int scale = 1;
@@ -103,30 +175,4 @@ vector<vector<KeyPoint>> getKeypointGroups(vector<KeyPoint> keypoints, int RADIU
 		kp_groups.push_back(tmp);
 	}
 	return kp_groups;
-}
-
-Mat detection(Mat &frame) {
-	Mat gray;
-	if (frame.channels() != 1) {
-		cvtColor(frame, gray, CV_BGR2GRAY);
-	} else {
-		frame.copyTo(gray);
-	}
-	
-	int blurSize = getBlurSize(CHAR_HEIGHT);
-	blur(gray, gray, Size(blurSize, blurSize));
-	
-	// Find vertical lines. Car plates have high density of vertical lines
-	Mat imgSobel;
-	Sobel(gray, imgSobel, CV_8U, 1, 0, 3, 1, 0);
-
-	// Threshold image
-	Mat imgThreshold;
-	threshold(imgSobel, imgThreshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
-	
-	// Morph close
-	Mat element = getStructuringElement(MORPH_RECT, Size(17, 3));
-	morphologyEx(imgThreshold, imgThreshold, CV_MOP_CLOSE, element);
-
-	return imgThreshold;
 }

@@ -12,7 +12,7 @@ Mat convertToGray(Mat& image) {
 	return gray;
 }
 
-void concatMat(Mat first, Mat second, Mat& destination, bool vertical) {
+void concatMat(Mat first, Mat second, Mat& destination, Direction concatDirection) {
 	assert(destination.channels() == 1);
 	
 	int width = first.cols;
@@ -22,7 +22,7 @@ void concatMat(Mat first, Mat second, Mat& destination, bool vertical) {
 	Mat gray2 = convertToGray(second);
 
 	gray1.copyTo(destination(Rect(0, 0, width, height)));
-	if (vertical)
+	if (concatDirection == VERTICAL)
 		gray2.copyTo(destination(Rect(0, height, width, height)));
 	else // horizontal
 		gray2.copyTo(destination(Rect(width, 0, width, height)));

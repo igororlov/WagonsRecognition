@@ -15,6 +15,10 @@
 using namespace cv;
 using namespace std;
 
+typedef enum {
+	VERTICAL, HORIZONTAL
+} Direction;
+
 /*
  * Returns grayscale image from input 
  * (if RGB - converts and returns, if gray - returns image itself).
@@ -26,7 +30,7 @@ Mat convertToGray(Mat& image);
  * Note 1: Destination image must have pre-allocated memory
  * Note 2: Size of destination image must be sufficient to fit both images.
  */
-void concatMat(Mat first, Mat second, Mat& destination, bool vertical = true);
+void concatMat(Mat first, Mat second, Mat& destination, Direction concatDirection = HORIZONTAL);
 
 /*
  * Returns size of square side for blurring the original frame.

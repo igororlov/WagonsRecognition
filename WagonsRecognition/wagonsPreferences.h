@@ -6,13 +6,12 @@
  */
 #define WINDOW_NAME "Main window"
 #define TRACKBAR_NAME "Frame No"
-#define WITH_TRACKBAR 0 // can be slower
+#define WITH_TRACKBAR 1 // can be slower
 
 /*
  * Recognition settings.
  */
 #define CHAR_HEIGHT 47
-
 
 
 #endif

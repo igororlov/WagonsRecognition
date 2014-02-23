@@ -14,6 +14,7 @@ void onTrackbarListener(int pos, void*) {
 
 // TODO implement image source! (now only video source). Try to avoid OOP
 int main() {
+	
 	int videoTrackNum = chooseVideoTrackNum();
 	string videoTrackPath = getPathToVideo(videoTrackNum);
 	if (videoTrackPath.length() == 0) {
@@ -30,21 +31,29 @@ int main() {
 
 	double rate = capture.get(CV_CAP_PROP_FPS); // frames per second
 	int delay = 1000 / (int)rate;
-	
+	printf("Frame rate: %.2f; Delay in milliseconds: %d\n", rate, delay);
+
 	Mat frame;
+	
 	while (1) {
-		if (!capture.read(frame))
+		if (!capture.read(frame)) // TODO move to while condition
 			break;
 
 		if (WITH_TRACKBAR)
 			setTrackbarPos(TRACKBAR_NAME, WINDOW_NAME, ++SLIDER_POSITION);
 		
-		Mat detected = detection(frame);
-
-		Mat target(frame.rows, frame.cols*2, CV_8UC1);
-		concatMat(frame, detected, target, false);
-		imshow(WINDOW_NAME, target);
+		MorphologyDetector detector;
+		detector.detect(frame);
 		
+		Mat detected; // TODO just for debugging to see initial frame and detected, delete later
+		detector.morphDetect(frame, detected); // does the same job as in Detector
+		
+		detector.drawRects(frame);
+		
+		Mat target(frame.rows, frame.cols*2, CV_8UC1);
+		concatMat(frame, detected, target, HORIZONTAL);
+		imshow(WINDOW_NAME, target);
+
 		char c = waitKey(delay);
 		if (c == 27) {
 			break;
