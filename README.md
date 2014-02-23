@@ -10,4 +10,9 @@ http://www.rzd.me/inform-block/numbers-vagon-carg/ <br/>
 http://www.translogist.ru/check_n.asp <br/>
 http://железнодорожник.рф/poleznaja_informacija/rasshifrovka_nomera_vagona/ <br/>
 
-See also project's [Wiki](https://github.com/igororlov92/WagonsRecognition/wiki)
+See also project's [Wiki](https://github.com/igororlov92/WagonsRecognition/wiki) <br/>
+
+Path variables: <br/>
+$(OPENCVINCDIR) must be (OpenCVFolder)\include <br/>
+$(OPENCVLIBDIR) must be (OpenCVFolder)\lib
+
